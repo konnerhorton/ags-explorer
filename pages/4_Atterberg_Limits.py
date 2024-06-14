@@ -1,5 +1,5 @@
 import plotly.graph_objects as go
-import streamlit as sts
+import streamlit as st
 
 from scripts import ags, page_utilities, plots
 
