@@ -3,7 +3,6 @@
 from io import StringIO
 
 import streamlit as st
-import yaml
 
 import scripts.ags as ags
 

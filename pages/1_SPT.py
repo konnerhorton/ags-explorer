@@ -3,7 +3,6 @@
 # Import third party libraries
 
 import streamlit as st
-import yaml
 
 from scripts import ags, page_utilities, plots
 
