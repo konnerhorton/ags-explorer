@@ -5,12 +5,8 @@ from scripts import ags, page_utilities, plots
 
 
 def render_page():
-    # data = st.session_state["data"]
-    # df = data.atterberg_table()
-    with open("config.yaml", "r") as f:
-        config = yaml.safe_load(f)
-    path = config["AGS_PATH"]
-    data = ags.AGSdata(path)
+    data = st.session_state["data"]
+    df = data.atterberg_table()
     df = data.atterberg_table()
     fig = plots.plot_empty_uscs_plot()
     for geology, dfx in df.groupby("GEOL_LEG"):
