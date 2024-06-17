@@ -61,8 +61,8 @@ def get_gsd_general(
         clay_percent = None
 
     return {
-        "gravel": gravel_percent,
-        "sand": sand_percent,
-        "fines": fines_percent,
+        "Gravel": gravel_percent,
+        "Sand": sand_percent,
+        "Fines": fines_percent,
         # "clay": clay_percent,
     }

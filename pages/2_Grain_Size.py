@@ -1,7 +1,8 @@
+import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from scripts import ags, page_utilities, plots
+from scripts import ags, page_utilities, plots, soil_classification
 
 
 def render_page():
@@ -11,7 +12,7 @@ def render_page():
     fig = plots.empty_grain_size_distribution_detail()
     with st.sidebar:
         selected_samples = st.multiselect(label="Select Sample ID", options=sample_ids)
-
+    records = []
     for samp_id, dfx in df.groupby("SAMP_ID"):
 
         if samp_id in selected_samples:
@@ -19,8 +20,14 @@ def render_page():
             fig.add_trace(
                 go.Scatter(x=data[:, 0], y=data[:, 1], mode="lines", name=samp_id)
             )
+            gsd_data = dfx[["GRAT_SIZE", "GRAT_PERP"]].to_numpy()
+            gsd = soil_classification.get_gsd_general(gsd_data)
+            gsd["Sample ID"] = samp_id
+            records.append(gsd)
 
     st.plotly_chart(fig)
+    results = pd.DataFrame(records).set_index("Sample ID")
+    st.write(results[["Gravel", "Sand", "Fines"]])
 
 
 if "data" not in st.session_state:
