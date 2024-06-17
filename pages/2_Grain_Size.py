@@ -26,8 +26,9 @@ def render_page():
             records.append(gsd)
 
     st.plotly_chart(fig)
-    results = pd.DataFrame(records).set_index("Sample ID")
-    st.write(results[["Gravel", "Sand", "Fines"]])
+    if len(selected_samples) > 0:
+        results = pd.DataFrame(records).set_index("Sample ID")
+        st.write(results[["Gravel", "Sand", "Fines"]])
 
 
 if "data" not in st.session_state:
