@@ -64,25 +64,52 @@ class AGSdata:
         df0 = self.merge_geology("ISPT", "ISPT_TOP")[
             ["LOCA_ID", "ISPT_TOP", "ISPT_NVAL", "GEOL_LEG"]
         ]
-        df1 = self.dfs["LOCA"][["LOCA_ID", "LOCA_GL"]]
+        df1 = self.dfs["LOCA"][["LOCA_ID", "LOCA_GL", "LOCA_ALID", "LOCA_ORCO"]]
         df = pd.merge(left=df0, right=df1, how="left", on="LOCA_ID")
         # TODO fix the "LOCA_GL" to float problem and remove `.astype()`
         df["Top Elevation"] = df["LOCA_GL"].astype(float) - df["ISPT_TOP"]
-        categories_lower_limits = OrderedDict(
+
+        granular_lower_limits = OrderedDict(
             (
-                ("V Loose (0-4)", 0),
+                ("V. Loose (0-4)", 0),
                 ("Loose (4-10)", 4),
                 ("Med (10-30)", 10),
                 ("Dense (30-50)", 30),
                 ("V. Dense (>50)", 50),
-                ("Ref.", 150),
+                ("Ref.", 100),
             )
         )
 
-        bins = [v for k, v in categories_lower_limits.items()]
+        # Terzaghi & Peck, 1948
+        cohesive_lower_limits = OrderedDict(
+            (
+                ("V Soft (0-2)", 0),
+                ("Soft (2-4)", 2),
+                ("Med (4-8)", 4),
+                ("Stiff (8-15)", 8),
+                ("V. Stiff (15-30)", 15),
+                ("Hard (>30)", 30),
+                ("Ref.", 100),
+            )
+        )
+
+        bins = [v for k, v in granular_lower_limits.items()]
         bins.append(np.inf)
-        labels = [k for k, v in categories_lower_limits.items()]
-        df["Category"] = pd.cut(df["ISPT_NVAL"], bins=bins, labels=labels)
+        labels = [k for k, v in granular_lower_limits.items()]
+        df["Granular Category"] = pd.cut(
+            df["ISPT_NVAL"], bins=bins, labels=labels, right=False
+        )
+
+        bins = [v for k, v in cohesive_lower_limits.items()]
+        bins.append(np.inf)
+        labels = [k for k, v in cohesive_lower_limits.items()]
+        df["Cohesive Category"] = pd.cut(
+            df["ISPT_NVAL"], bins=bins, labels=labels, right=False
+        )
+
+        df["Cohesiveness"] = np.where(
+            df["GEOL_LEG"].isin(["CL", "ML"]), "cohesive", "non-cohesive"
+        )
 
         return df
 

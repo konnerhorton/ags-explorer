@@ -16,6 +16,11 @@ uploaded_file = st.file_uploader("Load and `.ags` file")
 if uploaded_file is not None:
     if "data" not in st.session_state:
         st.session_state["data"] = ags.AGSdata(uploaded_file)
+
 if "data" in st.session_state:
-    project_name = st.session_state["data"].project_name
+    data = st.session_state["data"]
+    project_name = data.project_name
+    df = data.dfs["LOCA"]
     st.write(f"Project Name: {project_name}")
+    st.subheader("Your project `Location Details` table")
+    st.write(df)

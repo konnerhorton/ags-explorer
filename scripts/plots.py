@@ -20,27 +20,46 @@ def rqd_by_depth(ags):
     return fig
 
 
-def spt_histogram(ags, elevation=None):
+def spt_histogram(ags, elevations=None, company=None, alignment=None):
+    # TODO change this to accept an arbitrary filter (instead of `company`)
 
     df = ags.spt_table()
-    if elevation:
-        df["Below Elevation"] = df["Top Elevation"] < elevation
+    if elevations:
+        df["Within Elevation Range"] = df["Top Elevation"].between(*elevations)
     else:
-        df["Below Elevation"] = True
-    fig = px.histogram(
-        df.sort_values("Category"),
-        x="Category",
+        df["Within Elevation Range"] = True
+
+    if company:
+        df = df[df["LOCA_ORCO"] == company]
+
+    if alignment:
+        df = df[df["LOCA_ALID"] == alignment]
+
+    fig_cohesive = px.histogram(
+        df[df["Cohesiveness"] == "cohesive"].sort_values("Cohesive Category"),
+        x="Cohesive Category",
         y="ISPT_NVAL",
-        color="Below Elevation",
+        color="Within Elevation Range",
         histnorm="percent",
         barmode="group",
     ).update(layout=dict(xaxis=dict(title="N"), yaxis=dict(title="Frequency")))
 
-    if elevation:
-        fig.update(layout=dict(showlegend=True))
+    fig_granular = px.histogram(
+        df[df["Cohesiveness"] == "non-cohesive"].sort_values("Granular Category"),
+        x="Granular Category",
+        y="ISPT_NVAL",
+        color="Within Elevation Range",
+        histnorm="percent",
+        barmode="group",
+    ).update(layout=dict(xaxis=dict(title="N"), yaxis=dict(title="Frequency")))
+
+    if elevations:
+        fig_cohesive.update(layout=dict(showlegend=True))
+        fig_granular.update(layout=dict(showlegend=True))
     else:
-        fig.update(layout=dict(showlegend=False))
-    return fig
+        fig_cohesive.update(layout=dict(showlegend=False))
+        fig_granular.update(layout=dict(showlegend=False))
+    return fig_cohesive, fig_granular
 
 
 def spt_by_depth(ags):
