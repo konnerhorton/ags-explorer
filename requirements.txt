@@ -4,4 +4,4 @@ pandas==2.2.2
 plotly==5.22.0
 python-AGS4==0.6.0
 scipy==1.13.1
-streamlit==1.35.0
+streamlit==1.37.0
